@@ -17,8 +17,7 @@ def create_ingestion(file_path):
         ]) 
     )
     
-    example_gen = CsvExampleGen(input_base=file_path, output_config=output)
-    return example_gen
+    return CsvExampleGen(input_base=file_path, output_config=output)
 
 if __name__ == "__main__":
     example_gen = create_ingestion(file_path=file_path)

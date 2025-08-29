@@ -1,8 +1,23 @@
-from tfx.orchestration.experimental.interactive.interactive_context import InteractiveContext
-from data_ingestion import example_gen
+from tfx.orchestration.local.local_dag_runner import LocalDagRunner
+from tfx.orchestration.pipeline import Pipeline
+from data_ingestion import create_ingestion
+import os
 
-context = InteractiveContext()
-context.run(example_gen)
+data_root = os.path.join(os.getcwd(), 'data')
 
-for artifact in example_gen.outputs['examples'].get():
-    print(artifact.uri)
+example_gen = create_ingestion(data_root)
+
+def create_pipeline(pipeline_root, metadata_path, data_root):
+    example_gen = create_ingestion(data_root)
+
+    return Pipeline(
+        pipeline_name="phishing_pipeline",
+        pipeline_root=pipeline_root,
+        metadata_connection_config=None,
+        components=[
+            example_gen
+        ]
+    ) 
+
+if __name__ == "__main__":
+    pipeline_root = os.path.join
