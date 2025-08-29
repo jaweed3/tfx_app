@@ -1,7 +1,7 @@
 import tensorflow_data_validation as tfdv
 
 stats = tfdv.generate_statistics_from_csv(
-    data_location='/data/phishingData.csv',
+    data_location='data/phisingData.csv',
     delimiter=','
 )
 
@@ -37,4 +37,10 @@ except:
 print(anomalies)
 
 tfdv.get_feature(schema, 'URL_length').drift_comparator.infinity_norm.threshold = 0.01
-drift_anomalies = tfdv.
+drift_anomalies = tfdv.validate_statistics(
+    statistics=train_stats,
+    schema=schema,
+    previous_statistics=val_stats
+)
+
+print(drift_anomalies)

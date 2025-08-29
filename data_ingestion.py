@@ -2,10 +2,11 @@ import tensorflow as tf
 import os
 from tfx.proto import example_gen_pb2
 from tfx.components import CsvExampleGen
-from tfx.utils.dsl_utils import external_input
+from tfx.v1.dsl import Importer
 
+FILE_NAME = 'phisingData.csv'
 base_dir = os.getcwd()
-data_dir = os.path.join(os.pardir, "data")
+file_path = os.path.join(data_dir, FILE_NAME)
 output = example_gen_pb2.Output(
    split_config=example_gen_pb2.SplitConfig(splits=[
         example_gen_pb2.SplitConfig.Split(name='train', hash_buckets=6),
@@ -14,12 +15,4 @@ output = example_gen_pb2.Output(
     ]) 
 )
 
-examples = external_input(os.path.join(base_dir, data_dir))
-example_gen = CsvExampleGen(input=examples, output_config=output)
-
-
-# Running the Context
-context.run(example_gen)
-
-for artifact in example_gen.outputs['examples'].get():
-    print(artifact)
+example_gen = CsvExampleGen(input_base=file_path, output_config=output)
