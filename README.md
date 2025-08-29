@@ -1,5 +1,11 @@
 # Phishing Site Detection with a TFX Pipeline
 
+
+[![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org/)
+[![TensorFlow](https://img.shields.io/badge/TensorFlow-2.13-orange)](https://www.tensorflow.org/)
+[![TFX](https://img.shields.io/badge/TFX-1.13.0-green)](https://www.tensorflow.org/tfx)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 This project is an implementation and experiment in building an end-to-end machine learning pipeline using **TensorFlow Extended (TFX)**. The goal is to automate the workflow, from data ingestion to model training and validation, to classify a website as either legitimate or a phishing site.
 
 This project is heavily inspired by the book *"Building Machine Learning Pipelines"* by Hannes Hapke & Catherine Nelson, which is a fantastic resource for MLOps practices.
