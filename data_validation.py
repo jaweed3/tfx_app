@@ -1,9 +1,10 @@
 import tensorflow_data_validation as tfdv
+from tfx.components.statistics_gen.component import StatisticsGen
 
-def validate_data(example_artifact_path):
-    # Creating data statistics
-    data_stats = tfdv.generate_statistics_from_tfrecord(
-        data_location=example_artifact_path
+def validate_data(tfrecord_channel):
+    # Statistics Gen
+    data_stats = StatisticsGen(
+        examples=tfrecord_channel
     )
 
     # Creatting datta schema
