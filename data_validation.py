@@ -7,9 +7,11 @@ def validate_data(tfrecord_channel):
         examples=tfrecord_channel
     )
 
+    statistics_proto = tfdv.load_statistics(data_stats)
+
     # Creatting datta schema
     data_schema = tfdv.infer_schema(
-        statistics=data_stats
+        statistics=statistics_proto
     )
     tfdv.display_schema(schema=data_schema)
 
