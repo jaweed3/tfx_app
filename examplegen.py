@@ -8,7 +8,7 @@ FILE_NAME = 'phisingData.csv'
 base_dir = os.getcwd()
 file_path = os.path.join(base_dir, FILE_NAME)
 
-def create_ingestion(file_path):
+def examplegen(file_path):
     output = example_gen_pb2.Output(
        split_config=example_gen_pb2.SplitConfig(splits=[
             example_gen_pb2.SplitConfig.Split(name='train', hash_buckets=6),
