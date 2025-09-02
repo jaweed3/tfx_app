@@ -5,6 +5,7 @@ from examplegen import examplegen
 from schemagen import schema_gen
 from statisticsgen import statistics_gen
 from examplevalidator import example_validator
+from transform import transform_data
 import os
 
 data_root = os.path.join(os.getcwd(), 'data')
@@ -29,11 +30,20 @@ def create_pipeline(pipeline_root, metadata_path, data_root):
     ) 
     print(f"\nExample Validator : \n{validator_data}")
 
+    # Transform Components
+    transform = transform_data(
+        example_gen=example_gen.outputs['examples'],
+        schema_gen=schema_data.outputs['schema'],
+        module_file='./'
+    )
+    print(f"\nTransform Components : \n{transform}")
+
     components = [
         example_gen,
         validate_gen,
         schema_data,
-        validator_data
+        validator_data,
+        transform
     ]
 
     return Pipeline(
