@@ -1,10 +1,16 @@
-import absl
+from absl import logging
 import tensorflow as tf
 import tensorflow_transform as tft
-from tf.keras.layers import Input, Dense, concatenate
-from tfx.components import Trainer, CsvExampleGen
+from tensorflow.keras.layers import Input, Dense, concatenate
+from tfx.components import Trainer
 from tfx.v1.proto import TrainArgs, EvalArgs
 from tfx.components.trainer.fn_args_utils import FnArgs
+
+FEATURE_KEY = ["having_IP_Address","URL_Length","Shortining_Service","having_At_Symbol","double_slash_redirecting","Prefix_Suffix","having_Sub_Domain","SSLfinal_State","Domain_registeration_length","Favicon","port","HTTPS_token","Request_URL","URL_of_Anchor","Links_in_tags","SFH","Submitting_to_email","Abnormal_URL","Redirect","on_mouseover","RightClick","popUpWidnow","Iframe","age_of_domain","DNSRecord","web_traffic","Page_Rank","Google_Index","Links_pointing_to_page","Statistical_report"]
+LABEL_KEY = ["Result"]
+
+def _transformed_name(key) -> None:
+    return key + "_xf"
 
 def training_phase(
     module_file,
@@ -20,6 +26,8 @@ def training_phase(
         train_args=TrainArgs(splits=['train'], num_steps=train_steps),
         eval_args=EvalArgs(splits=['eval'], num_steps=eval_steps)
     )
+
+    return trainer
 
 def _build_keras_model(
     transform_output: tft.TFTransformOutput) -> tf.keras.Model :
@@ -47,7 +55,7 @@ def _build_keras_model(
         loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
         metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
 
-    model.summary(print_fn=absl.logging.info)
+    model.summary(print_fn=logging.info)
 
     return model
 
@@ -59,21 +67,29 @@ def _input_fn(
     """
     Create Dataset for training and evaluation
     """
-    dataset = 
+    dataset = tf.data.experimental.make_batched_features_dataset(
+        file_pattern=file_pattern,
+        batch_size=batch_size,
+        features=tf_transform_output.transformed_feature_spec(),
+        reader=tf.data.TFRecordDataset,
+        label_key=_transformed_name(LABEL_KEY)
+    )
+    return dataset
 
-def run_fn(
-    train_data: CsvExampleGen,
-    eval_data: CsvExampleGen,
-    fn_args: FnArgs) -> None:
+def run_fn(fn_args: FnArgs) -> None :
+    """Entry Point for TFX Trainer Component"""
 
-    # Define train dataset
-    train_dataset = train_data
+    tf_transform_output = tft.TFTransformOutput(fn_args.transform_output)
 
-    # Define Eval Dataset
-    eval_dataset = eval_data
+    train_dataset = _input_fn(fn_args.train_files, tf_transform_output)
+    eval_dataset = _input_fn(fn_args.eval_files,  tf_transform_output)
 
-    #
     model = _build_keras_model()
 
-    model.fit()
-    model.save(fn_args.serving_model_dir)
+    model.fit(
+        train_dataset,
+        steps_per_epoch=fn_args.train_steps,
+        validation_data=eval_dataset,
+        validation_steps=fn_args.eval_steps
+    )
+    model.save(fn_args.serving_model_dir, save_format='tf')
