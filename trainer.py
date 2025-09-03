@@ -3,31 +3,14 @@ import tensorflow as tf
 import tensorflow_transform as tft
 from tensorflow.keras.layers import Input, Dense, concatenate
 from tfx.components import Trainer
-from tfx.v1.proto import TrainArgs, EvalArgs
 from tfx.components.trainer.fn_args_utils import FnArgs
 
 FEATURE_KEY = ["having_IP_Address","URL_Length","Shortining_Service","having_At_Symbol","double_slash_redirecting","Prefix_Suffix","having_Sub_Domain","SSLfinal_State","Domain_registeration_length","Favicon","port","HTTPS_token","Request_URL","URL_of_Anchor","Links_in_tags","SFH","Submitting_to_email","Abnormal_URL","Redirect","on_mouseover","RightClick","popUpWidnow","Iframe","age_of_domain","DNSRecord","web_traffic","Page_Rank","Google_Index","Links_pointing_to_page","Statistical_report"]
+
 LABEL_KEY = ["Result"]
 
 def _transformed_name(key) -> None:
     return key + "_xf"
-
-def training_phase(
-    module_file,
-    examples,
-    transform_graph,
-    train_steps,
-    eval_steps
-):
-    trainer = Trainer(
-        module_file=module_file,
-        examples=examples,
-        transform_graph=transform_graph,
-        train_args=TrainArgs(splits=['train'], num_steps=train_steps),
-        eval_args=EvalArgs(splits=['eval'], num_steps=eval_steps)
-    )
-
-    return trainer
 
 def _build_keras_model(
     transform_output: tft.TFTransformOutput) -> tf.keras.Model :
