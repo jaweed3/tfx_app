@@ -15,22 +15,22 @@ data_root = os.path.join(os.getcwd(), 'data')
 def create_pipeline(pipeline_root, metadata_path, data_root):
     # ExmapleGen Components
     example_gen = examplegen(data_root)
-    print(f"\nExample Gen : \n {example_gen}")
+    print(f"\nExample Gen Output : \n {example_gen.outputs}")
     
     # ValidationGen Component
     validate_gen = statistics_gen(example_gen.outputs['examples'])
-    print(f"\nValidation Gen : \n {validate_gen}")
+    print(f"\nValidation Gen Output : \n {validate_gen.outputs}")
 
     # SchemaGen Component
     schema_data = schema_gen(validate_gen.outputs['statistics'])
-    print(f"\nSchema Gen : \n {schema_data}")
+    print(f"\nSchema Gen Output : \n {schema_data.outputs}")
 
     # Example Validator Component
     validator_data = example_validator(
         validate_gen.outputs['statistics'],
         schema_data.outputs['schema']
     ) 
-    print(f"\nExample Validator : \n{validator_data}")
+    print(f"\nExample Validator Output : \n{validator_data.outputs}")
 
     # Transform Components
     transform = transform_data(
@@ -38,7 +38,7 @@ def create_pipeline(pipeline_root, metadata_path, data_root):
         schema_gen=schema_data.outputs['schema'],
         module_file=os.path.join(os.getcwd(), "transform.py")
     )
-    print(f"\nTransform Components : \n{transform}")
+    print(f"\nTransform Components Output : \n{transform.outputs}")
 
     trainer = Trainer(
         module_file=os.path.join(os.getcwd(), "trainer.py"),
@@ -47,7 +47,7 @@ def create_pipeline(pipeline_root, metadata_path, data_root):
         train_args=TrainArgs(splits=['train'], num_steps=10000),
         eval_args=EvalArgs(splits=['eval'], num_steps=5000)
     )
-    print(f"\nTrainer Component : \n{trainer}")
+    print(f"\nTrainer Component Output : \n{trainer.outputs}")
     
     components = [
         example_gen,
@@ -66,8 +66,8 @@ def create_pipeline(pipeline_root, metadata_path, data_root):
     ) 
 
 if __name__ == "__main__":
-    pipeline_root = os.path.join(data_root, "pipeline")
-    metadata_path = os.path.join(data_root, "metadata.sqlite")
+    pipeline_root = os.path.join(os.getcwd(), 'tfx_pipeline', "pipeline")
+    metadata_path = os.path.join(os.getcwd(), 'tfx_pipeline', "metadata.sqlite")
 
     pipeline = create_pipeline(pipeline_root, metadata_path, data_root)
     LocalDagRunner().run(pipeline)
